@@ -1,0 +1,4 @@
+#!/bin/sh
+cd `dirname $0`
+../src/drl_adhoc_clustering -n .:../src $*
+# for shared lib, use: opp_run -l ../src/drl_adhoc_clustering -n .:../src $*
