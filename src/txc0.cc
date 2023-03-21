@@ -26,19 +26,16 @@ void Txc0::initialize()
     // to send the first message. Let this be `tic'.
 
     // Am I Tic or Toc?
-    if (strcmp("tic", getName()) == 0) {
+    if (strcmp("hi", getName()) == 0) {
         // create and send first message on gate "out". "tictocMsg" is an
         // arbitrary string which will be the name of the message object.
-        cMessage *msg = new cMessage("tictocMsg");
+        cMessage *msg = new cMessage("First message.");
         send(msg, "out");
     }
 }
 
 void Txc0::handleMessage(cMessage *msg)
 {
-    // The handleMessage() method is called whenever a message arrives
-    // at the module. Here, we just send it to the other module, through
-    // gate `out'. Because both `tic' and `toc' does the same, the message
-    // will bounce between the two.
-    send(msg, "out"); // send out the message
+    EV << "Received message: " << msg->getFullName() << omnetpp::endl;
+    send(new cMessage("whoop!"), "out");
 }
