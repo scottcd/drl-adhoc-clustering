@@ -165,3 +165,4 @@ backups
 /doc/src/manual/usman.log
 /simulations/results/*
 /simulations/frames/*
+/simulations/*.mp4
