@@ -166,3 +166,4 @@ backups
 /simulations/results/*
 /simulations/frames/*
 /simulations/*.mp4
+/src/*_dbg

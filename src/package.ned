@@ -1,5 +1,5 @@
 package drl_adhoc_clustering;
-import inet.*.*.RandomWaypointMobility;
+import inet.mobility.single.*;
 
 
 module MobileNode 
