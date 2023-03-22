@@ -1,17 +1,11 @@
 package drl_adhoc_clustering;
-import inet.mobility.single.*;
+import inet.*.*.RandomWaypointMobility;
 
-simple Node
-{
-    @class(BaseNode);
-    gates:
-        input in;
-        output out;
-}
 
-module MobileNode extends Node
+module MobileNode 
 {
     parameters:
+        @class(BaseNode);
 	    double minX @unit(m) = default(0m);
 	    double minY @unit(m) = default(0m);
 	    double minZ @unit(m) = default(0m);
@@ -20,6 +14,9 @@ module MobileNode extends Node
 	    double maxZ @unit(m) = default(0m);
 	    double waitTime @unit(s) = default(0s);
 	    double speed @unit(mps) = default(500mps);
+	gates:
+        input in;
+        output out;
 	submodules:
         mobility: RandomWaypointMobility {
             @display("p=100,50");
@@ -39,18 +36,22 @@ network MobileClustering
     @display("bgb=2500,1000");
     types:
         channel C extends ned.DatarateChannel {
+        	@display("ls=#4169E1");
         	// how can I know a good mean, std?
         	delay = normal(100ms, 20ms);
         }
     submodules:
         ding: MobileNode {
+            @display("i=abstract/penguin");
             maxY = 500m;
-            waitTime = 1s;
+            waitTime = .5s;
+            speed = normal(2000mps, 200ms);
         }
         dong: MobileNode {
+        	@display("i=abstract/penguin");
         	minY = 500m;
-        	waitTime = 2s;
-        	speed = 2000mps;
+        	waitTime = 1s;
+        	speed = normal(2000mps, 200ms);
         }
     connections:
         ding.out --> C --> dong.in;
