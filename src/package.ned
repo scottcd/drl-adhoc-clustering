@@ -45,13 +45,13 @@ network MobileClustering
             @display("i=abstract/penguin");
             maxY = 500m;
             waitTime = .5s;
-            speed = normal(2000mps, 200ms);
+            speed = normal(2000mps, 200mps);
         }
         dong: MobileNode {
         	@display("i=abstract/penguin");
         	minY = 500m;
         	waitTime = 1s;
-        	speed = normal(2000mps, 200ms);
+        	speed = normal(2000mps, 200mps);
         }
     connections:
         ding.out --> C --> dong.in;
