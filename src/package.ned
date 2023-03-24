@@ -6,54 +6,34 @@ module MobileNode
 {
     parameters:
         @class(BaseNode);
-	    double minX @unit(m) = default(0m);
-	    double minY @unit(m) = default(0m);
-	    double minZ @unit(m) = default(0m);
-	    double maxX @unit(m) = default(2500m);
-	    double maxY @unit(m) = default(1000m);
-	    double maxZ @unit(m) = default(0m);
-	    double waitTime @unit(s) = default(0s);
-	    double speed @unit(mps) = default(500mps);
+        @display("i=abstract/penguin_vs");
+        bool initiate = default(false);
+        double timeout @unit(ms) = default(10000ms);
 	gates:
-        input in;
-        output out;
+        input in @loose; 
+        output out @loose;
 	submodules:
-        mobility: RandomWaypointMobility {
-            @display("p=100,50");
-			speed = parent.speed;
-			waitTime = parent.waitTime;
-            constraintAreaMinX = parent.minX;
-            constraintAreaMinY = parent.minY;
-            constraintAreaMinZ = parent.minZ;
-            constraintAreaMaxX = parent.maxX;
-            constraintAreaMaxY = parent.maxY;
-            constraintAreaMaxZ = parent.maxZ;
-        }
+        mobility: RandomWaypointMobility;
 }
 
 network MobileClustering
 {
-    @display("bgb=2500,1000");
+    parameters:
+        @display("bgb=800,560;bgi=background/terrain");
+        int numHosts = default(10);
+        node[0].initiate = true;
     types:
         channel C extends ned.DatarateChannel {
         	@display("ls=#4169E1");
-        	// how can I know a good mean, std?
-        	delay = normal(100ms, 20ms);
+        	delay = truncnormal(100ms, 20ms);
         }
+    
     submodules:
-        ding: MobileNode {
-            @display("i=abstract/penguin");
-            maxY = 500m;
-            waitTime = .5s;
-            speed = normal(2000mps, 200mps);
-        }
-        dong: MobileNode {
-        	@display("i=abstract/penguin");
-        	minY = 500m;
-        	waitTime = 1s;
-        	speed = normal(2000mps, 200mps);
-        }
+        node[numHosts]: MobileNode;
     connections:
-        ding.out --> C --> dong.in;
-        dong.out --> C --> ding.in;
+        for i=0..sizeof(node)-2
+        {
+            node[i].out --> C --> node[i+1].in;
+        }
+        node[sizeof(node)-1].out --> C --> node[0].in;
 }
