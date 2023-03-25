@@ -10,8 +10,7 @@ module MobileNode
         bool initiate = default(false);
         double timeout @unit(ms) = default(10000ms);
 	gates:
-        input in @loose; 
-        output out @loose;
+        inout gate[];
 	submodules:
         mobility: RandomWaypointMobility;
 }
@@ -33,7 +32,7 @@ network MobileClustering
     connections:
         for i=0..sizeof(node)-2
         {
-            node[i].out --> C --> node[i+1].in;
+            node[i].gate++ <--> C <--> node[i+1].gate++;
         }
-        node[sizeof(node)-1].out --> C --> node[0].in;
+        node[numHosts-1].gate++ <--> C <--> node[0].gate++;
 }

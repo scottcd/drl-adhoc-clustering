@@ -31,8 +31,10 @@ void BaseNode::initialize()
     WATCH(receivedMessages);
     WATCH(sentMessages);
 
+    int n = gateSize("gate");
+    int outputGate = intuniform(0, n-1);
     if (initializeComs == true) {
-        send(new cMessage("Greetings"), "out");
+        send(new cMessage("Greetings"), "gate$o", outputGate);
         sentMessages++;
     }
 }
@@ -43,17 +45,19 @@ void BaseNode::initialize()
 void BaseNode::handleMessage(cMessage *msg)
 {
     // receive, digest, then delete message
-    EV << "Received message: " << msg->getFullName() << omnetpp::endl;
+    EV << "Received message: " <<  msg->getFullName() << omnetpp::endl;
     receivedMessages++;
     delete msg;
 
+    int n = gateSize("gate");
+    int outputGate = intuniform(0, n-1);
     // return a message
     if (initializeComs == true) {
-        send(new cMessage("Howdy"), "out");
+        send(new cMessage("Howdy"), "gate$o", outputGate);
         sentMessages++;
     }
     else {
-        send(new cMessage("Hey"), "out");
+        send(new cMessage("Hey"), "gate$o", outputGate);
         sentMessages++;
     }
 }
