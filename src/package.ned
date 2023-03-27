@@ -1,38 +1,35 @@
 package drl_adhoc_clustering;
 import inet.mobility.single.*;
+import inet.networklayer.configurator.ipv4.Ipv4NetworkConfigurator;
+import inet.node.contract.INetworkNode;
+import inet.physicallayer.wireless.common.contract.packetlevel.IRadioMedium;
+import inet.visualizer.contract.IIntegratedVisualizer;
+import inet.physicallayer.wireless.ieee80211.packetlevel.Ieee80211ScalarRadioMedium;
+import inet.node.inet.AdhocHost;
 
-
-module MobileNode 
+module Node extends AdhocHost
 {
     parameters:
         @class(BaseNode);
         @display("i=abstract/penguin_vs");
-        bool initiate = default(false);
-        double timeout @unit(ms) = default(10000ms);
-	gates:
-        inout gate[];
-	submodules:
-        mobility: RandomWaypointMobility;
 }
 
 network MobileClustering
 {
     parameters:
         @display("bgb=800,560;bgi=background/terrain");
+        @statistic[receptionPower](host="receptionMinSignalPower(radioMedium.signalArrivalStarted)"; record=last);
         int numHosts = default(10);
-        node[0].initiate = true;
-    types:
-        channel C extends ned.DatarateChannel {
-        	@display("ls=#4169E1");
-        	delay = truncnormal(100ms, 20ms);
-        }
-    
     submodules:
-        node[numHosts]: MobileNode;
-    connections:
-        for i=0..sizeof(node)-2
-        {
-            node[i].gate++ <--> C <--> node[i+1].gate++;
+        visualizer: <default(firstAvailableOrEmpty("IntegratedCanvasVisualizer"))> like IIntegratedVisualizer if typename != "" {
+            @display("p=30,-50");
+        
         }
-        node[numHosts-1].gate++ <--> C <--> node[0].gate++;
+       	configurator: Ipv4NetworkConfigurator {
+       		@display("p=130,-50");
+       	}
+        radioMedium: Ieee80211ScalarRadioMedium {
+            @display("p=230,-50");
+        }
+        host[numHosts]: Node;
 }

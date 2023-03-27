@@ -24,19 +24,19 @@ Define_Module(BaseNode);
 */
 void BaseNode::initialize()
 {
-    initializeComs = par("initiate");
+// initializeComs = par("initiate");
+    initializeComs = true;
     receivedMessages = 0;
     sentMessages = 0;
 
     WATCH(receivedMessages);
     WATCH(sentMessages);
 
-    int n = gateSize("gate");
-    int outputGate = intuniform(0, n-1);
-    if (initializeComs == true) {
-        send(new cMessage("Greetings"), "gate$o", outputGate);
-        sentMessages++;
-    }
+
+    //cGate *gate = gate("port$o");
+
+    //EV << "MSG  " << gate->getName() << omnetpp::endl;
+
 }
 
 /*
@@ -44,22 +44,11 @@ void BaseNode::initialize()
 */
 void BaseNode::handleMessage(cMessage *msg)
 {
+    bubble("Received a message!");
     // receive, digest, then delete message
     EV << "Received message: " <<  msg->getFullName() << omnetpp::endl;
     receivedMessages++;
     delete msg;
-
-    int n = gateSize("gate");
-    int outputGate = intuniform(0, n-1);
-    // return a message
-    if (initializeComs == true) {
-        send(new cMessage("Howdy"), "gate$o", outputGate);
-        sentMessages++;
-    }
-    else {
-        send(new cMessage("Hey"), "gate$o", outputGate);
-        sentMessages++;
-    }
 }
 
 /*
