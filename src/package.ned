@@ -1,17 +1,22 @@
 package drl_adhoc_clustering;
-import inet.mobility.single.*;
 import inet.networklayer.configurator.ipv4.Ipv4NetworkConfigurator;
-import inet.node.contract.INetworkNode;
-import inet.physicallayer.wireless.common.contract.packetlevel.IRadioMedium;
-import inet.visualizer.contract.IIntegratedVisualizer;
-import inet.physicallayer.wireless.ieee80211.packetlevel.Ieee80211ScalarRadioMedium;
+import inet.physicallayer.wireless.unitdisk.UnitDiskRadioMedium;import inet.visualizer.contract.IIntegratedVisualizer;
 import inet.node.inet.AdhocHost;
+import inet.applications.contract.IApp;
+
+
 
 module Node extends AdhocHost
 {
     parameters:
         @class(BaseNode);
         @display("i=abstract/penguin_vs");
+}
+
+simple MyApp like IApp {
+    gates:
+        input socketIn @labels(UdpControlInfo/up);
+        output socketOut @labels(UdpControlInfo/down);
 }
 
 network MobileClustering
@@ -23,13 +28,13 @@ network MobileClustering
     submodules:
         visualizer: <default(firstAvailableOrEmpty("IntegratedCanvasVisualizer"))> like IIntegratedVisualizer if typename != "" {
             @display("p=30,-50");
-        
         }
        	configurator: Ipv4NetworkConfigurator {
        		@display("p=130,-50");
        	}
-        radioMedium: Ieee80211ScalarRadioMedium {
+        radioMedium: UnitDiskRadioMedium {
             @display("p=230,-50");
         }
         host[numHosts]: Node;
 }
+

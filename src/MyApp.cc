@@ -5,7 +5,7 @@
 
 using namespace omnetpp;
 
-class BaseNode : public cSimpleModule
+class MyApp : public cSimpleModule
 {
   private:
     long receivedMessages;
@@ -19,12 +19,12 @@ class BaseNode : public cSimpleModule
 };
 
 // The module class needs to be registered with OMNeT++
-Define_Module(BaseNode);
+Define_Module(MyApp);
 
 /*
     Initialize the base node. If node's name is ding, send greeting message.
 */
-void BaseNode::initialize()
+void MyApp::initialize()
 {
 // initializeComs = par("initiate");
     initializeComs = true;
@@ -34,13 +34,13 @@ void BaseNode::initialize()
     WATCH(receivedMessages);
     WATCH(sentMessages);
 
-
+    EV << "hi there!" << endl;
 }
 
 /*
     Event when node receives a message. If ding, return 'Howdy', else, return 'Hey'.
 */
-void BaseNode::handleMessage(cMessage *msg)
+void MyApp::handleMessage(cMessage *msg)
 {
     bubble("Received a message!");
     // receive, digest, then delete message
@@ -53,7 +53,7 @@ void BaseNode::handleMessage(cMessage *msg)
     Record statistics gathered in data members at the end of simulation.
     Only runs if the simulation finishes successfully.
 */
-void BaseNode::finish()
+void MyApp::finish()
 {
     EV << "Some cool data for " << getFullName() << omnetpp::endl;
     EV << "Number of Messages Sent:     " << sentMessages << omnetpp::endl;
