@@ -35,7 +35,7 @@ Define_Module(MyApp);
 */
 void MyApp::initialize()
 {
-// initializeComs = par("initiate");
+    // initializeComs = par("initiate");
     initializeComs = true;
     receivedMessages = 0;
     sentMessages = 0;
@@ -43,8 +43,9 @@ void MyApp::initialize()
     WATCH(receivedMessages);
     WATCH(sentMessages);
 
-    EV << "hi there!" << endl;
+    EV << "Initializing.." << endl;
 
+    // establish connection to DRL server
     sock = 0;
     struct sockaddr_in serv_addr;
 
@@ -57,23 +58,21 @@ void MyApp::initialize()
     serv_addr.sin_family = AF_INET;
     serv_addr.sin_port = htons(PORT);
 
-    // Convert IPv4 and IPv6 addresses from text to binary form
-    if (inet_pton(AF_INET, "127.0.0.1", &serv_addr.sin_addr) <= 0) {
-        std::cerr << "Invalid address/ Address not supported" << std::endl;
-        return;
-    }
-
     if (connect(sock, (struct sockaddr *)&serv_addr, sizeof(serv_addr)) < 0) {
         std::cerr << "Connection Failed" << std::endl;
         return;
     }
 
-    const char *hello = "Hello from client";
-    ::send(sock, hello, strlen(hello), 0);
-    std::cout << "Hello message sent" << std::endl;
+
+    // send greeting to DRL server
+    cModule* node = getParentModule();
+    const char *nodeName =  node->getFullName();
+    ::send(sock, nodeName, strlen(nodeName), 0);
+    std::cout << "Initial message sent to DRL server." << std::endl;
+
+    // receive ACK from DRL server
     int valread = read(sock, buffer, 1024);
     std::cout << buffer << std::endl;
-
 }
 
 /*

@@ -33,7 +33,7 @@ network MobileClustering
     parameters:
         @display("bgb=800,560;bgi=background/terrain");
         @statistic[receptionPower](host="receptionMinSignalPower(radioMedium.signalArrivalStarted)"; record=last);
-        int numHosts = default(10);
+        int numNodes = default(10);
     submodules:
         visualizer: <default(firstAvailableOrEmpty("IntegratedCanvasVisualizer"))> like IIntegratedVisualizer if typename != "" {
             @display("p=30,-50");
@@ -44,7 +44,7 @@ network MobileClustering
         radioMedium: UnitDiskRadioMedium {
             @display("p=230,-50");
         }
-        host[numHosts]: AdhocHost {
+        node[numNodes]: AdhocHost {
         	@display("i=abstract/penguin_vs");
         }
 }
