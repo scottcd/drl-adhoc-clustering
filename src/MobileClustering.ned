@@ -22,7 +22,7 @@ import inet.node.inet.AdhocHost;
 import inet.applications.contract.IApp;
 
 
-simple MyApp like IApp {
+simple DRLApp like IApp {
     gates:
         input socketIn @labels(UdpControlInfo/up);
         output socketOut @labels(UdpControlInfo/down);

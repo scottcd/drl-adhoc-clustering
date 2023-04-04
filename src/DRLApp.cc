@@ -12,12 +12,9 @@
 
 using namespace omnetpp;
 
-class MyApp : public cSimpleModule
+class DRLApp : public cSimpleModule
 {
   private:
-    long receivedMessages;
-    long sentMessages;
-    bool initializeComs;
     int sock;
   
   protected:
@@ -28,23 +25,13 @@ class MyApp : public cSimpleModule
 
 
 // The module class needs to be registered with OMNeT++
-Define_Module(MyApp);
+Define_Module(DRLApp);
 
 /*
-    Initialize the base node. If node's name is ding, send greeting message.
+    Initialize connection with DRL server and schedule next message.
 */
-void MyApp::initialize()
+void DRLApp::initialize()
 {
-    // initializeComs = par("initiate");
-    initializeComs = true;
-    receivedMessages = 0;
-    sentMessages = 0;
-
-    WATCH(receivedMessages);
-    WATCH(sentMessages);
-
-    EV << "Initializing.." << endl;
-
     // establish connection to DRL server
     sock = 0;
     struct sockaddr_in serv_addr;
@@ -63,7 +50,6 @@ void MyApp::initialize()
         return;
     }
 
-
     // send greeting to DRL server
     cModule* node = getParentModule();
     const char *nodeName =  node->getFullName();
@@ -73,17 +59,33 @@ void MyApp::initialize()
     // receive ACK from DRL server
     int valread = read(sock, buffer, 1024);
     std::cout << buffer << std::endl;
+
+    // schedule next message
+    scheduleAt(simTime() + 1, new cMessage);
 }
 
 /*
-    Event when node receives a message. If ding, return 'Howdy', else, return 'Hey'.
+    Handle self-scheduled message talking to DRL server
 */
-void MyApp::handleMessage(cMessage *msg)
+void DRLApp::handleMessage(cMessage *msg)
 {
-    bubble("Received a message!");
-    // receive, digest, then delete message
-    EV << "Received message: " <<  msg->getFullName() << omnetpp::endl;
-    receivedMessages++;
+    EV << "Talking to server.." << omnetpp::endl;
+
+    cModule* node = getParentModule();
+    EV << node->getSubmodule("wlan", 0) << omnetpp::endl;
+
+    // send message to DRL server
+    const char *str =  "Number 5";
+    ::send(sock, str, strlen(str), 0);
+    std::cout << "Message sent to DRL server." << std::endl;
+
+    // receive ACK from DRL server
+    char buffer[1024] = {0};
+    int valread = read(sock, buffer, 1024);
+    std::cout << buffer << std::endl;
+
+    // schedule next self message and clean up
+    scheduleAt(simTime() + 1, new cMessage);
     delete msg;
 }
 
@@ -91,11 +93,8 @@ void MyApp::handleMessage(cMessage *msg)
     Record statistics gathered in data members at the end of simulation.
     Only runs if the simulation finishes successfully.
 */
-void MyApp::finish()
+void DRLApp::finish()
 {
     EV << "Some cool data for " << getFullName() << omnetpp::endl;
-    EV << "Number of Messages Sent:     " << sentMessages << omnetpp::endl;
-    EV << "Number of Messages Received: " << receivedMessages << omnetpp::endl;
-
     close(sock);
 }
