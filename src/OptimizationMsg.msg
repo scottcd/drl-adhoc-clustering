@@ -1,0 +1,4 @@
+message OptimizationMsg
+{
+    int number;
+}

@@ -33,10 +33,11 @@ PROJECTRELATIVE_PATH = src
 O = $(PROJECT_OUTPUT_DIR)/$(CONFIGNAME)/$(PROJECTRELATIVE_PATH)
 
 # Object files for local .cc, .msg and .sm files
-OBJS = $O/DRLApp.o
+OBJS = $O/DRLApp.o $O/TCPClusteringApp.o $O/OptimizationMsg_m.o
 
 # Message files
-MSGFILES =
+MSGFILES = \
+    OptimizationMsg.msg
 
 # SM files
 SMFILES =

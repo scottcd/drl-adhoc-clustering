@@ -24,9 +24,20 @@ import inet.applications.contract.IApp;
 
 simple DRLApp like IApp {
     gates:
-        input socketIn @labels(UdpControlInfo/up);
-        output socketOut @labels(UdpControlInfo/down);
+        input socketIn @labels(TcpControlInfo/up);
+        output socketOut @labels(TcpControlInfo/down);
+        output out @loose;
 }
+
+simple TCPClusteringApp like IApp {
+    parameters:
+        int number = default(0) @mutable; 
+    gates:
+        input socketIn @labels(TcpControlInfo/up);
+        output socketOut @labels(TcpControlInfo/down);
+        input drlIn @loose;
+}
+
 
 network MobileClustering
 {
@@ -45,6 +56,8 @@ network MobileClustering
             @display("p=230,-50");
         }
         node[numNodes]: AdhocHost {
-        	@display("i=abstract/penguin_vs");
+	        @display("i=abstract/penguin_vs");
         }
 }
+
+

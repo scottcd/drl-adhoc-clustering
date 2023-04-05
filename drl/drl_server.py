@@ -59,8 +59,9 @@ def handle_client(conn, addr):
             #                               #
             
             # send ___ to client
-            print(f'Received: {data.decode()}. Replying..')
-            conn.sendall(data)
+            print(f'Received: {data.decode()}. Replying with 6.')
+            number = 6
+            conn.sendall(str(number).encode())
             
     # connection closed by client
     print(f'Connection closed by {addr}')     

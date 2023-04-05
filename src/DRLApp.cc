@@ -6,6 +6,8 @@
 #include <sys/socket.h>
 #include <arpa/inet.h>
 #include <unistd.h>
+#include "OptimizationMsg_m.h"
+#include "TCPClusteringApp.h"
 
 #define PORT 65432
 
@@ -32,6 +34,13 @@ Define_Module(DRLApp);
 */
 void DRLApp::initialize()
 {
+    // initialize communication with TCP app
+    cGate* tcpAppGate =  getParentModule()->getSubmodule("app", 2)->gate("drlIn");
+    gate("out")->connectTo(tcpAppGate);
+    OptimizationMsg *msg = new OptimizationMsg("Initialize");
+    msg->setNumber(1);
+    send(msg, "out");
+
     // establish connection to DRL server
     sock = 0;
     struct sockaddr_in serv_addr;
@@ -61,7 +70,7 @@ void DRLApp::initialize()
     std::cout << buffer << std::endl;
 
     // schedule next message
-    scheduleAt(simTime() + 1, new cMessage);
+    scheduleAt(simTime() + 1, new cMessage("Scheduled DRL Server Ping"));
 }
 
 /*
@@ -71,21 +80,28 @@ void DRLApp::handleMessage(cMessage *msg)
 {
     EV << "Talking to server.." << omnetpp::endl;
 
-    cModule* node = getParentModule();
-    EV << node->getSubmodule("wlan", 0) << omnetpp::endl;
+    TCPClusteringApp* m = (TCPClusteringApp*)getParentModule()->getSubmodule("app", 2);
+    int number = m->getNumber();
+    EV << number << omnetpp::endl;
+    //EV << getParentModule()->getSubmodule("app", 2)->getProperties() << omnetpp::endl;
 
     // send message to DRL server
-    const char *str =  "Number 5";
+    const char *str =  "5";
     ::send(sock, str, strlen(str), 0);
-    std::cout << "Message sent to DRL server." << std::endl;
+    EV << "Message sent to DRL server." << omnetpp::endl;
 
     // receive ACK from DRL server
     char buffer[1024] = {0};
     int valread = read(sock, buffer, 1024);
-    std::cout << buffer << std::endl;
+    EV << buffer << omnetpp::endl;
+
+    // send data to TCPClusteringApp
+    OptimizationMsg *optMsg = new OptimizationMsg("Parameter Optimization");
+    optMsg->setNumber(atoi(buffer));
+    send(optMsg, "out");
 
     // schedule next self message and clean up
-    scheduleAt(simTime() + 1, new cMessage);
+    scheduleAt(simTime() + 1, new cMessage("Scheduled DRL Server Ping"));
     delete msg;
 }
 
