@@ -34,6 +34,7 @@ Define_Module(DRLApp);
 */
 void DRLApp::initialize()
 {
+    EV << "hi" << endl;
     // initialize communication with TCP app
     cGate* tcpAppGate =  getParentModule()->getSubmodule("app", 2)->gate("drlIn");
     gate("out")->connectTo(tcpAppGate);
@@ -53,6 +54,7 @@ void DRLApp::initialize()
 
     serv_addr.sin_family = AF_INET;
     serv_addr.sin_port = htons(PORT);
+    serv_addr.sin_addr.s_addr = inet_addr("127.0.0.1");
 
     if (connect(sock, (struct sockaddr *)&serv_addr, sizeof(serv_addr)) < 0) {
         std::cerr << "Connection Failed" << std::endl;
