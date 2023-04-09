@@ -7,7 +7,7 @@
 #include <arpa/inet.h>
 #include <unistd.h>
 #include "OptimizationMsg_m.h"
-#include "TCPClusteringApp.h"
+#include "TCPAdhocServerApp.h"
 
 #define PORT 65432
 
@@ -82,7 +82,7 @@ void DRLApp::handleMessage(cMessage *msg)
 {
     EV << "Talking to server.." << omnetpp::endl;
 
-    TCPClusteringApp* m = (TCPClusteringApp*)getParentModule()->getSubmodule("app", 2);
+    TCPAdhocServerApp* m = (TCPAdhocServerApp*)getParentModule()->getSubmodule("app", 2);
     int number = m->getNumber();
     EV << number << omnetpp::endl;
     //EV << getParentModule()->getSubmodule("app", 2)->getProperties() << omnetpp::endl;
