@@ -19,6 +19,7 @@ protected:
     simtime_t delay;
     simtime_t maxMsgDelay;
     std::map<int, ChunkQueue> socketQueue;
+    cMessage *appMsg = nullptr;
 
     int number;
     long msgsRcvd;

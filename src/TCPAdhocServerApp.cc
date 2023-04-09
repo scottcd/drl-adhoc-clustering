@@ -16,12 +16,11 @@ Define_Module(TCPAdhocServerApp);
 void TCPAdhocServerApp::initialize(int stage)
 {
     cSimpleModule::initialize(stage);
+    appMsg = new cMessage("TCPAdhocApp");
 
     if (stage == INITSTAGE_LOCAL) {
         delay = par("replyDelay");
         maxMsgDelay = 0;
-
-        // statistics
         number = msgsRcvd = msgsSent = bytesRcvd = bytesSent = 0;
 
         WATCH(number);
@@ -37,12 +36,14 @@ void TCPAdhocServerApp::initialize(int stage)
         socket.bind(localAddress[0] ? L3AddressResolver().resolve(localAddress) : L3Address(), localPort);
         socket.listen();
 
-        scheduleAt(simTime()+1, new cMessage("TCPAdhocApp"));
+
+        scheduleAt(simTime()+1, appMsg);
     }
 }
 
 void TCPAdhocServerApp::sendOrSchedule(cMessage *msg, simtime_t delay)
 {
+    EV << "snd or schedule" << endl;
     if (delay == 0)
         sendBack(msg);
     else
@@ -51,6 +52,7 @@ void TCPAdhocServerApp::sendOrSchedule(cMessage *msg, simtime_t delay)
 
 void TCPAdhocServerApp::sendBack(cMessage *msg)
 {
+    EV << "snd back" << endl;
     Packet *packet = dynamic_cast<Packet *>(msg);
 
     if (packet) {
@@ -74,6 +76,7 @@ void TCPAdhocServerApp::sendBack(cMessage *msg)
 */
 void TCPAdhocServerApp::handleMessage(cMessage *msg)
 {
+    EV << "msg" << endl;
     if (msg->arrivedOn("drlIn"))
     {
         OptimizationMsg * optMsg = check_and_cast<OptimizationMsg *>(msg);
@@ -84,7 +87,7 @@ void TCPAdhocServerApp::handleMessage(cMessage *msg)
     }
     else if (msg->isSelfMessage()) {
         EV_INFO << "Self-Scheduled message" << endl;
-        scheduleAt(simTime()+1, new cMessage("TCPAdhocApp"));
+        scheduleAt(simTime()+1, appMsg);
     }
     else if (msg->getKind() == TCP_I_PEER_CLOSED) {
         // we'll close too, but only after there's surely no message
@@ -105,6 +108,7 @@ void TCPAdhocServerApp::handleMessage(cMessage *msg)
 
         bool doClose = false;
         while (queue.has<GenericAppMsg>(b(-1))) {
+            std::cout << "gen" << endl;
             const auto& appmsg = queue.pop<GenericAppMsg>(b(-1));
             msgsRcvd++;
             bytesRcvd += B(appmsg->getChunkLength()).get();
@@ -140,7 +144,9 @@ void TCPAdhocServerApp::handleMessage(cMessage *msg)
         }
     }
     else if (msg->getKind() == TCP_I_AVAILABLE)
+    {
         socket.processMessage(msg);
+    }
     else {
         // some indication -- ignore
         EV_WARN << "drop msg: " << msg->getName() << ", kind:" << msg->getKind() << "(" << cEnum::get("inet::TcpStatusInd")->getStringFor(msg->getKind()) << ")\n";

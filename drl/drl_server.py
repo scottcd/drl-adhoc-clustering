@@ -14,6 +14,7 @@ __date__ = "04/02/2023"
 
 import socket
 import threading
+import torch
 
 HOST = '127.0.0.1'
 PORT = 65432 

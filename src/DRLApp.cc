@@ -36,7 +36,7 @@ void DRLApp::initialize()
 {
     EV << "hi" << endl;
     // initialize communication with TCP app
-    cGate* tcpAppGate =  getParentModule()->getSubmodule("app", 2)->gate("drlIn");
+    cGate* tcpAppGate =  getParentModule()->getSubmodule("app", 1)->gate("drlIn");
     gate("out")->connectTo(tcpAppGate);
     OptimizationMsg *msg = new OptimizationMsg("Initialize");
     msg->setNumber(1);

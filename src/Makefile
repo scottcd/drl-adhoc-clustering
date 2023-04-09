@@ -33,7 +33,13 @@ PROJECTRELATIVE_PATH = src
 O = $(PROJECT_OUTPUT_DIR)/$(CONFIGNAME)/$(PROJECTRELATIVE_PATH)
 
 # Object files for local .cc, .msg and .sm files
-OBJS = $O/DRLApp.o $O/TCPAdhocClientApp.o $O/TCPAdhocServerApp.o $O/OptimizationMsg_m.o
+OBJS = \
+    $O/DRLApp.o \
+    $O/PingAdhocApp.o \
+    $O/TCPAdhocClientApp.o \
+    $O/TCPAdhocServerApp.o \
+    $O/UdpAdhocApp.o \
+    $O/OptimizationMsg_m.o
 
 # Message files
 MSGFILES = \
