@@ -1,4 +1,6 @@
-#include "TCPAdhocServerApp.h"
+
+#include "TcpAdhocServerApp.h"
+
 #include "inet/common/TimeTag_m.h"
 #include "inet/applications/tcpapp/GenericAppMsg_m.h"
 #include "inet/common/ProtocolTag_m.h"
@@ -8,15 +10,15 @@
 #include "inet/common/lifecycle/NodeStatus.h"
 
 
-Define_Module(TCPAdhocServerApp);
+Define_Module(TcpAdhocServerApp);
 
 /*
     TCP stuff..
 */
-void TCPAdhocServerApp::initialize(int stage)
+void TcpAdhocServerApp::initialize(int stage)
 {
     cSimpleModule::initialize(stage);
-    appMsg = new cMessage("TCPAdhocApp");
+    appMsg = new cMessage("TcpAdhocApp");
 
     if (stage == INITSTAGE_LOCAL) {
         delay = par("replyDelay");
@@ -41,48 +43,19 @@ void TCPAdhocServerApp::initialize(int stage)
     }
 }
 
-void TCPAdhocServerApp::sendOrSchedule(cMessage *msg, simtime_t delay)
-{
-    EV << "snd or schedule" << endl;
-    if (delay == 0)
-        sendBack(msg);
-    else
-        scheduleAfter(delay, msg);
-}
-
-void TCPAdhocServerApp::sendBack(cMessage *msg)
-{
-    EV << "snd back" << endl;
-    Packet *packet = dynamic_cast<Packet *>(msg);
-
-    if (packet) {
-        msgsSent++;
-        bytesSent += packet->getByteLength();
-        emit(packetSentSignal, packet);
-
-        EV_INFO << "sending \"" << packet->getName() << "\" to TCP, " << packet->getByteLength() << " bytes\n";
-    }
-    else {
-        EV_INFO << "sending \"" << msg->getName() << "\" to TCP\n";
-    }
-
-    auto& tags = check_and_cast<ITaggedObject *>(msg)->getTags();
-    tags.addTagIfAbsent<DispatchProtocolReq>()->setProtocol(&Protocol::tcp);
-    send(msg, "socketOut");
-}
 
 /*
     Handle self-scheduled message talking to DRL server
 */
-void TCPAdhocServerApp::handleMessage(cMessage *msg)
+void TcpAdhocServerApp::handleMessage(cMessage *msg)
 {
     EV << "msg" << endl;
     if (msg->arrivedOn("drlIn"))
     {
-        OptimizationMsg * optMsg = check_and_cast<OptimizationMsg *>(msg);
+        cMessage * optMsg = check_and_cast<cMessage *>(msg);
         EV << "Received parameters from DRL app!" << omnetpp::endl;
 
-        number = optMsg->getNumber();
+        number = 0;
         EV << "Number set to " << number << omnetpp::endl;
     }
     else if (msg->isSelfMessage()) {
@@ -154,25 +127,18 @@ void TCPAdhocServerApp::handleMessage(cMessage *msg)
     }
 }
 
-void TCPAdhocServerApp::refreshDisplay() const
-{
-    char buf[64];
-    sprintf(buf, "rcvd: %ld pks %ld bytes\nsent: %ld pks %ld bytes", msgsRcvd, bytesRcvd, msgsSent, bytesSent);
-    getDisplayString().setTagArg("t", 0, buf);
-}
-
 /*
     Record statistics gathered in data members at the end of simulation.
     Only runs if the simulation finishes successfully.
 */
-void TCPAdhocServerApp::finish()
+void TcpAdhocServerApp::finish()
 {
-    EV << "Some cool data for " << getFullName() << omnetpp::endl;
-    EV_INFO << getFullPath() << ": sent " << bytesSent << " bytes in " << msgsSent << " packets\n";
-    EV_INFO << getFullPath() << ": received " << bytesRcvd << " bytes in " << msgsRcvd << " packets\n";
+    TcpGenericServerApp::finish();
+
+    std::cout << "done" << endl;
 }
 
-int TCPAdhocServerApp::getNumber()
+int TcpAdhocServerApp::getNumber()
 {
     return number;
 }

@@ -13,13 +13,14 @@
 // along with this program.  If not, see http://www.gnu.org/licenses/.
 // 
 
-package drl_adhoc_clustering;
+package drl_adhoc_clustering.applications;
 
-import inet.applications.contract.IApp;
+import inet.applications.pingapp.PingApp;
 
-simple DRLApp like IApp {
-    gates:
-        input socketIn @labels(TcpControlInfo/up);
-        output socketOut @labels(TcpControlInfo/down);
-        output out @loose;
+simple PingAdhocApp extends PingApp
+{
+	parameters:
+		@class("PingAdhocApp");
+		bool drl = default(false);
 }
+

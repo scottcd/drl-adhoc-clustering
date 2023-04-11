@@ -19,9 +19,7 @@ import inet.networklayer.configurator.ipv4.Ipv4NetworkConfigurator;
 import inet.physicallayer.wireless.unitdisk.UnitDiskRadioMedium;
 import inet.visualizer.contract.IIntegratedVisualizer;
 import inet.node.inet.AdhocHost;
-
-//simple MyApp extends TCPAppBase {
-//}
+import inet.applications.pingapp.PingApp;
 
 network MobileClustering
 {
