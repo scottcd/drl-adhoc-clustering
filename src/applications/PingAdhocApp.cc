@@ -11,7 +11,7 @@ void PingAdhocApp::initialize(int stage)
         sending = false;
         if (drl == true)
         {
-            createDrlConnection();
+            createDrlConnection(getContainingNode(this)->getFullName());
         }
         timeoutTimer = new cMessage("Ping Timeout");
     }
@@ -85,20 +85,22 @@ void PingAdhocApp::handleSelfMessage(cMessage *msg)
         const Coord sourceVelocity  = sourceMobility->getCurrentVelocity();
         const Coord destPosition  = destMobility->getCurrentPosition();
         const Coord destVelocity = destMobility->getCurrentVelocity();
-        std::string sendString = sourcePosition.str() + " "
+        std::string sendString = "PING "
+                + sourcePosition.str() + " "
                 + sourceVelocity.str() + " "
                 + destPosition.str() + " "
                 + destVelocity.str() + " ";
 
         // send src and dest nodes' position and velocity
-        double score = sendDrlData(sendString.c_str());
+        sendDrlData(sendString.c_str());
+        double score = receiveDrlData();
 
-        if (score > 0.5) {
-            EV << score << " > 0.5. Pinging "  << destAddr << "." << endl;
+        if (score == 1) {
+            EV << score << " == 1. Pinging "  << destAddr << "." << endl;
             sendPingRequest();
             sending = true;
         } else {
-            EV << score << " <= 0.5. Not pinging "  << destAddr << "." << endl;
+            EV << score << " != 1. Not pinging "  << destAddr << "." << endl;
         }
     }
     // else, just send normally
@@ -133,7 +135,7 @@ void PingAdhocApp::socketDataArrived(INetworkSocket *socket, Packet *packet)
     if (sending == true)
     {
         const char* name = getContainingNode(this)->getFullName();
-        std::string myData = std::string(name) + ": socket data arrived";
+        std::string myData = "REPLY " + std::string(name) + ": socket data arrived.";
 
         sendDrlData(myData.c_str());
         sending = false;

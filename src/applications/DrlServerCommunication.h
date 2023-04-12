@@ -25,8 +25,9 @@ class DrlServerCommunication
     protected:
         int sock;
 
-        void createDrlConnection();
-        double sendDrlData(const char* data);
+        void createDrlConnection(const char* name);
+        void sendDrlData(const char* data);
+        double receiveDrlData();
         void closeDrlConnection();
 };
 

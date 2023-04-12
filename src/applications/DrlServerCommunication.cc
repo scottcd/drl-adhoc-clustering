@@ -4,14 +4,15 @@
 /*
     Initialize connection with DRL server and schedule next message.
 */
-void DrlServerCommunication::createDrlConnection()
+void DrlServerCommunication::createDrlConnection(const char* name)
 {
     // establish connection to DRL server
     sock = 0;
     struct sockaddr_in serv_addr;
 
     char buffer[1024] = {0};
-    if ((sock = socket(AF_INET, SOCK_STREAM, 0)) < 0) {
+    if ((sock = socket(AF_INET, SOCK_STREAM, 0)) < 0)
+    {
         std::cerr << "Socket creation error" << std::endl;
         return;
     }
@@ -20,36 +21,35 @@ void DrlServerCommunication::createDrlConnection()
     serv_addr.sin_port = htons(PORT);
     serv_addr.sin_addr.s_addr = inet_addr("127.0.0.1");
 
-    if (connect(sock, (struct sockaddr *)&serv_addr, sizeof(serv_addr)) < 0) {
+    if (connect(sock, (struct sockaddr *)&serv_addr, sizeof(serv_addr)) < 0)
+    {
         std::cerr << "Connection Failed" << std::endl;
         return;
     }
-
-    // send greeting to DRL server
-    send(sock, "chandler", strlen("chandler"), 0);
-    std::cout << "Initial message sent to DRL server." << std::endl;
-
-    // receive ACK from DRL server
-    int valread = read(sock, buffer, 1024);
-    std::cout << buffer << std::endl;
+    ::send(sock, name, strlen(name), 0);
 }
 
 /*
     Handle self-scheduled message talking to DRL server
 */
-double DrlServerCommunication::sendDrlData(const char* data)
+void DrlServerCommunication::sendDrlData(const char *data)
 {
-    EV << "Talking to server.." << omnetpp::endl;
+    EV << "Sending to server.." << omnetpp::endl;
     ::send(sock, data, strlen(data), 0);
+}
 
+/*
+    Handle self-scheduled message talking to DRL server
+*/
+double DrlServerCommunication::receiveDrlData()
+{
+    EV << "Receiving from server.." << omnetpp::endl;
     // receive ACK from DRL server
     char buffer[1024] = {0};
     int valread = read(sock, buffer, 1024);
     EV << buffer << omnetpp::endl;
 
-    double X=((double)rand()/(double)RAND_MAX);
-
-    return X;
+    return strtod(buffer, nullptr);
 }
 
 /*
