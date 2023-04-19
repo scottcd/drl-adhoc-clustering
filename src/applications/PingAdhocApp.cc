@@ -1,20 +1,22 @@
 #include "PingAdhocApp.h"
-
+#include <chrono>
+#include <thread>
 
 Define_Module(PingAdhocApp);
 
 void PingAdhocApp::initialize(int stage)
 {
-    PingApp::initialize(stage);
     if (stage == INITSTAGE_LOCAL) {
         drl = par("drl");
         sending = false;
         if (drl == true)
         {
             createDrlConnection(getContainingNode(this)->getFullName());
+            std::this_thread::sleep_for(std::chrono::milliseconds(100));
         }
         timeoutTimer = new cMessage("Ping Timeout");
     }
+    PingApp::initialize(stage);
 }
 
 void PingAdhocApp::handleSelfMessage(cMessage *msg)

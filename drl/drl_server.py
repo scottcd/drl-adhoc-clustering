@@ -49,13 +49,15 @@ def listen_for_connections():
     server_socket.listen()
 
     print(f'Listening for client connections on port {PORT}..')
+    num = 0
 
     while True:
+        num += 1
         conn, addr = server_socket.accept()
-        client_thread = threading.Thread(target=handle_client, args=(conn, addr))
+        client_thread = threading.Thread(target=handle_client, args=(conn, addr, num))
         client_thread.start()
 
-def handle_client(conn, addr):
+def handle_client(conn, addr, connection_number):
     """
     Handles client messages until the client closes the connection.
     """
@@ -75,9 +77,11 @@ def handle_client(conn, addr):
     with conn:
         while True:
             # receive data from client
+            print('waiting for data')
             data = conn.recv(1024).decode()
             if not data:
                 break
+            print(f'got "{data}" here')
             values = data.split()
             
             if values[0] == "PING":
@@ -117,7 +121,7 @@ def handle_client(conn, addr):
     print(f'Connection closed by {addr}')  
     # output learned policies to file
     print(policy_net(state.to_tensor()).max(0))
-    torch.save(policy_net.state_dict(), f'{node_name}_policy_net.pth')
+    torch.save(policy_net.state_dict(), f'policies/{connection_number}_policy_net.pth')
     # policy_net.load_state_dict(torch.load('policy_net.pth'))
 
     
